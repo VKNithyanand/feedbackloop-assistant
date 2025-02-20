@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { Card } from "./ui/card";
 import { Question } from "@/types/interview";
+import { useState } from "react";
 
 interface InterviewCardProps {
   question: Question;
@@ -10,6 +11,15 @@ interface InterviewCardProps {
 }
 
 export const InterviewCard = ({ question, onAnswer, isRecording = false }: InterviewCardProps) => {
+  const [answer, setAnswer] = useState("");
+
+  const handleSubmit = () => {
+    if (answer.trim()) {
+      onAnswer(answer);
+      setAnswer("");
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -33,7 +43,8 @@ export const InterviewCard = ({ question, onAnswer, isRecording = false }: Inter
           <textarea
             className="w-full min-h-[120px] p-3 rounded-md border bg-background/50"
             placeholder="Type your answer here..."
-            onChange={(e) => onAnswer(e.target.value)}
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
           />
           
           <div className="flex justify-between items-center">
@@ -47,9 +58,9 @@ export const InterviewCard = ({ question, onAnswer, isRecording = false }: Inter
             </div>
             <button
               className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity"
-              onClick={() => onAnswer("")}
+              onClick={handleSubmit}
             >
-              Next Question
+              Submit Answer
             </button>
           </div>
         </div>
