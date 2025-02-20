@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -11,8 +10,10 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { Navbar } from "./components/Navbar";
+import Leaderboard from "./pages/Leaderboard";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
 
-// Create a new QueryClient instance outside the component
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -51,7 +52,6 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Separate the App component definition
 function App() {
   return (
     <React.StrictMode>
@@ -66,6 +66,30 @@ function App() {
                   element={
                     <PrivateRoute>
                       <Index />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/leaderboard"
+                  element={
+                    <PrivateRoute>
+                      <Leaderboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/settings"
+                  element={
+                    <PrivateRoute>
+                      <Settings />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <PrivateRoute>
+                      <Profile />
                     </PrivateRoute>
                   }
                 />
