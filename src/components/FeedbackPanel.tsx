@@ -12,7 +12,7 @@ export const FeedbackPanel = ({ feedback }: FeedbackPanelProps) => {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="w-full max-w-md"
+      className="w-full max-w-2xl"
     >
       <Card className="glass-card p-6 space-y-6">
         <div className="space-y-2">
@@ -28,7 +28,7 @@ export const FeedbackPanel = ({ feedback }: FeedbackPanelProps) => {
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h4 className="font-medium mb-2">Strengths</h4>
             <ul className="space-y-1">
@@ -52,6 +52,20 @@ export const FeedbackPanel = ({ feedback }: FeedbackPanelProps) => {
               ))}
             </ul>
           </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <h4 className="font-medium mb-2">Detailed Analysis</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {Object.entries(feedback.detailedAnalysis).map(([key, value]) => (
+                <div key={key} className="text-center p-3 bg-secondary/50 rounded-lg">
+                  <div className="text-sm font-medium capitalize">{key}</div>
+                  <div className="text-2xl font-semibold">{Math.round(value)}%</div>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <div>
             <h4 className="font-medium mb-2">Key Points Mentioned</h4>
@@ -66,6 +80,19 @@ export const FeedbackPanel = ({ feedback }: FeedbackPanelProps) => {
               ))}
             </div>
           </div>
+
+          {feedback.suggestions.length > 0 && (
+            <div>
+              <h4 className="font-medium mb-2">Follow-up Questions to Consider</h4>
+              <ul className="space-y-1">
+                {feedback.suggestions.map((suggestion, index) => (
+                  <li key={index} className="text-sm text-muted-foreground">
+                    • {suggestion}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </Card>
     </motion.div>

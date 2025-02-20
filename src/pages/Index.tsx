@@ -4,45 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { InterviewCard } from "@/components/InterviewCard";
 import { FeedbackPanel } from "@/components/FeedbackPanel";
 import { ProgressBar } from "@/components/ProgressBar";
-import type { Question, Answer, Feedback, InterviewSession } from "@/types/interview";
-
-const mockQuestions: Question[] = [
-  {
-    id: "1",
-    text: "Tell me about a challenging project you've worked on and how you overcame obstacles.",
-    category: "behavioral",
-    difficulty: "medium",
-  },
-  {
-    id: "2",
-    text: "What are your strongest technical skills and how have you applied them in past projects?",
-    category: "technical",
-    difficulty: "medium",
-  },
-  {
-    id: "3",
-    text: "How do you handle conflicts within a team?",
-    category: "situational",
-    difficulty: "hard",
-  },
-];
-
-const generateFeedback = (answer: string): Feedback => {
-  // This is a mock feedback generator - in production, this would use AI
-  return {
-    score: Math.floor(Math.random() * 30) + 70,
-    strengths: [
-      "Clear communication style",
-      "Provided specific examples",
-      "Demonstrated problem-solving skills",
-    ],
-    improvements: [
-      "Could provide more quantitative results",
-      "Consider structuring response with STAR method",
-    ],
-    keywords: ["teamwork", "communication", "problem-solving", "leadership"],
-  };
-};
+import { mockQuestions } from "@/data/mockQuestions";
+import { generateFeedback } from "@/utils/feedbackAnalysis";
+import type { Answer, InterviewSession } from "@/types/interview";
 
 const Index = () => {
   const [session, setSession] = useState<InterviewSession>({
@@ -64,7 +28,7 @@ const Index = () => {
       timestamp: Date.now(),
     };
 
-    const feedback = generateFeedback(text);
+    const feedback = generateFeedback(answer, currentQuestion);
 
     setSession((prev) => ({
       ...prev,
@@ -75,10 +39,9 @@ const Index = () => {
 
     setShowFeedback(true);
     
-    // Show feedback for 3 seconds before moving to the next question
     setTimeout(() => {
       setShowFeedback(false);
-    }, 3000);
+    }, 4000); // Increased to 4 seconds to give more time to read feedback
   };
 
   const currentQuestion = session.questions[session.currentQuestionIndex];

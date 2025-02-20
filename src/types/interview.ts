@@ -1,15 +1,27 @@
 
+export type QuestionCategory = "behavioral" | "technical" | "situational" | "leadership" | "problem-solving";
+export type DifficultyLevel = "easy" | "medium" | "hard" | "expert";
+
 export type Question = {
   id: string;
   text: string;
-  category: "behavioral" | "technical" | "situational";
-  difficulty: "easy" | "medium" | "hard";
+  category: QuestionCategory;
+  difficulty: DifficultyLevel;
+  expectedKeywords?: string[];
+  followUpQuestions?: string[];
+  scoringCriteria?: {
+    clarity: number;
+    relevance: number;
+    depth: number;
+  };
 };
 
 export type Answer = {
   questionId: string;
   text: string;
   timestamp: number;
+  audioUrl?: string;
+  duration?: number;
 };
 
 export type Feedback = {
@@ -17,6 +29,13 @@ export type Feedback = {
   strengths: string[];
   improvements: string[];
   keywords: string[];
+  detailedAnalysis: {
+    clarity: number;
+    relevance: number;
+    depth: number;
+    confidence: number;
+  };
+  suggestions: string[];
 };
 
 export type InterviewSession = {
@@ -26,4 +45,7 @@ export type InterviewSession = {
   questions: Question[];
   answers: Answer[];
   feedback: Feedback[];
+  overallScore?: number;
+  category?: string;
+  candidateName?: string;
 };
