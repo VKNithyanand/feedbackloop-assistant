@@ -35,10 +35,34 @@ const domains: Domain[] = [
     description: "CI/CD, Cloud platforms, and infrastructure",
     icon: "🚀",
   },
+  {
+    id: "mobile",
+    name: "Mobile Development",
+    description: "iOS, Android, and cross-platform development",
+    icon: "📱",
+  },
+  {
+    id: "cloud",
+    name: "Cloud Architecture",
+    description: "AWS, Azure, GCP, and cloud solutions",
+    icon: "☁️",
+  },
+  {
+    id: "security",
+    name: "Security Engineering",
+    description: "Cybersecurity, penetration testing, and security best practices",
+    icon: "🔒",
+  },
+  {
+    id: "data",
+    name: "Data Engineering",
+    description: "Big data, ETL, and data pipelines",
+    icon: "📊",
+  }
 ];
 
 interface DomainSelectionProps {
-  onSelect: (domain: string, mode: "practice" | "interview" | "quiz" | "coding") => void;
+  onSelect: (domain: string, mode: "practice" | "interview" | "quiz" | "coding" | "video") => void;
 }
 
 export const DomainSelection = ({ onSelect }: DomainSelectionProps) => {
@@ -51,7 +75,7 @@ export const DomainSelection = ({ onSelect }: DomainSelectionProps) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {domains.map((domain) => (
           <motion.div
             key={domain.id}
@@ -72,10 +96,10 @@ export const DomainSelection = ({ onSelect }: DomainSelectionProps) => {
                   Practice
                 </Button>
                 <Button
-                  onClick={() => onSelect(domain.id, "interview")}
+                  onClick={() => onSelect(domain.id, "video")}
                   className="w-full"
                 >
-                  Interview
+                  Video Interview
                 </Button>
                 <Button
                   variant="secondary"
@@ -87,9 +111,9 @@ export const DomainSelection = ({ onSelect }: DomainSelectionProps) => {
                 <Button
                   variant="secondary"
                   onClick={() => onSelect(domain.id, "coding")}
-                  className="w-full"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  Coding
+                  Code Editor
                 </Button>
               </div>
             </Card>

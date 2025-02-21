@@ -3,14 +3,22 @@ import { motion } from "framer-motion";
 import { Card } from "./ui/card";
 import { Question } from "@/types/interview";
 import { useState } from "react";
+import { VideoInterview } from "./VideoInterview";
+import { CodeEditor } from "./CodeEditor";
 
 interface InterviewCardProps {
   question: Question;
   onAnswer: (text: string) => void;
   isRecording?: boolean;
+  mode?: "practice" | "interview" | "quiz" | "coding" | "video";
 }
 
-export const InterviewCard = ({ question, onAnswer, isRecording = false }: InterviewCardProps) => {
+export const InterviewCard = ({ 
+  question, 
+  onAnswer, 
+  isRecording = false,
+  mode = "practice" 
+}: InterviewCardProps) => {
   const [answer, setAnswer] = useState("");
 
   const handleSubmit = () => {
@@ -19,6 +27,25 @@ export const InterviewCard = ({ question, onAnswer, isRecording = false }: Inter
       setAnswer("");
     }
   };
+
+  if (mode === "video") {
+    return (
+      <VideoInterview
+        question={question}
+        onComplete={(recordingUrl) => onAnswer(recordingUrl)}
+        onNext={() => onAnswer("")}
+      />
+    );
+  }
+
+  if (mode === "coding") {
+    return (
+      <CodeEditor
+        question={question}
+        onSubmit={onAnswer}
+      />
+    );
+  }
 
   return (
     <motion.div
