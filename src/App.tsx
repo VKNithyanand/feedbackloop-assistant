@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,6 +14,7 @@ import { Navbar } from "./components/Navbar";
 import Leaderboard from "./pages/Leaderboard";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
+import VideoInterview from "./pages/VideoInterview";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +68,14 @@ function App() {
                   element={
                     <PrivateRoute>
                       <Index />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/video-interview"
+                  element={
+                    <PrivateRoute>
+                      <VideoInterview />
                     </PrivateRoute>
                   }
                 />
