@@ -5,6 +5,7 @@ export const mockQuestions: Question[] = [
   {
     id: "1",
     text: "Tell me about a challenging project you've worked on and how you overcame obstacles.",
+    type: "behavioral",
     category: "behavioral",
     difficulty: "medium",
     expectedKeywords: ["challenge", "solution", "teamwork", "results", "learning"],
@@ -21,6 +22,7 @@ export const mockQuestions: Question[] = [
   {
     id: "2",
     text: "Describe a situation where you had to debug a complex technical issue. What was your approach?",
+    type: "technical",
     category: "technical",
     difficulty: "hard",
     expectedKeywords: ["debugging", "analysis", "problem-solving", "tools", "solution"],
@@ -37,6 +39,7 @@ export const mockQuestions: Question[] = [
   {
     id: "3",
     text: "How do you handle conflicts within a team?",
+    type: "situational",
     category: "situational",
     difficulty: "medium",
     expectedKeywords: ["communication", "resolution", "mediation", "compromise", "understanding"],
@@ -53,6 +56,7 @@ export const mockQuestions: Question[] = [
   {
     id: "4",
     text: "Explain a time when you had to make a difficult decision with incomplete information.",
+    type: "leadership",
     category: "leadership",
     difficulty: "hard",
     expectedKeywords: ["decision-making", "risk", "analysis", "outcome", "stakeholders"],

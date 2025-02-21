@@ -1,4 +1,3 @@
-
 export type QuestionCategory = "behavioral" | "technical" | "situational" | "leadership" | "problem-solving";
 export type DifficultyLevel = "easy" | "medium" | "hard" | "expert";
 
@@ -10,6 +9,13 @@ export type Question = {
   difficulty: DifficultyLevel;
   options?: string[];
   expectedAnswer?: string;
+  expectedKeywords?: string[];
+  followUpQuestions?: string[];
+  scoringCriteria?: {
+    clarity: number;
+    relevance: number;
+    depth: number;
+  };
 };
 
 export type Answer = {
