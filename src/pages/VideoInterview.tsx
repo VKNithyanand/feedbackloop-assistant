@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { VideoInterview } from '@/components/VideoInterview';
+import { Interview } from '@/components/Interview';
 import { Question } from '@/types/interview';
 
 const sampleQuestion: Question = {
@@ -15,8 +15,8 @@ const sampleQuestion: Question = {
 const VideoInterviewPage = () => {
   const [isComplete, setIsComplete] = useState(false);
 
-  const handleComplete = (recordingUrl: string) => {
-    console.log('Recording URL:', recordingUrl);
+  const handleComplete = (response: { text?: string; recordingUrl?: string; code?: string }) => {
+    console.log('Response:', response);
     setIsComplete(true);
   };
 
@@ -26,10 +26,11 @@ const VideoInterviewPage = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">Video Interview</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Interview</h1>
       <div className="max-w-4xl mx-auto">
-        <VideoInterview
+        <Interview
           question={sampleQuestion}
+          mode="interview"
           onComplete={handleComplete}
           onNext={handleNext}
         />

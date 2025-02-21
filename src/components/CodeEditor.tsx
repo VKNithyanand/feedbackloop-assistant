@@ -2,31 +2,44 @@
 import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Question } from '@/types/interview';
+import { useToast } from "@/components/ui/use-toast";
 
 interface CodeEditorProps {
-  question: Question;
-  onSubmit: (code: string) => void;
+  code: string;
+  onChange: (code: string) => void;
+  language?: string;
 }
 
-export const CodeEditor = ({ question, onSubmit }: CodeEditorProps) => {
-  const [code, setCode] = useState('');
+export const CodeEditor = ({ code, onChange, language = 'javascript' }: CodeEditorProps) => {
+  const { toast } = useToast();
+  const [isCompiling, setIsCompiling] = useState(false);
 
-  const handleSubmit = () => {
-    onSubmit(code);
+  const handleCompile = async () => {
+    setIsCompiling(true);
+    try {
+      // Basic JS validation
+      new Function(code);
+      toast({
+        title: "Success",
+        description: "Code compiled successfully!",
+      });
+    } catch (error) {
+      toast({
+        title: "Compilation Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsCompiling(false);
+    }
   };
 
   return (
     <Card className="p-6 space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold">{question.text}</h3>
-        <p className="text-muted-foreground">{question.category}</p>
-      </div>
-
       <div className="relative">
         <textarea
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          onChange={(e) => onChange(e.target.value)}
           className="w-full h-[400px] font-mono text-sm p-4 bg-black text-white rounded-lg"
           placeholder="Write your code here..."
         />
@@ -35,14 +48,15 @@ export const CodeEditor = ({ question, onSubmit }: CodeEditorProps) => {
       <div className="flex justify-end gap-2">
         <Button
           variant="outline"
-          onClick={() => setCode('')}
+          onClick={() => onChange('')}
         >
           Clear
         </Button>
         <Button
-          onClick={handleSubmit}
+          onClick={handleCompile}
+          disabled={isCompiling}
         >
-          Submit Solution
+          {isCompiling ? 'Compiling...' : 'Compile'}
         </Button>
       </div>
     </Card>
