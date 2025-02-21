@@ -5,15 +5,11 @@ export type DifficultyLevel = "easy" | "medium" | "hard" | "expert";
 export type Question = {
   id: string;
   text: string;
+  type: string;
   category: QuestionCategory;
   difficulty: DifficultyLevel;
-  expectedKeywords?: string[];
-  followUpQuestions?: string[];
-  scoringCriteria?: {
-    clarity: number;
-    relevance: number;
-    depth: number;
-  };
+  options?: string[];
+  expectedAnswer?: string;
 };
 
 export type Answer = {

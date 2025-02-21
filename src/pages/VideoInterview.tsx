@@ -6,10 +6,10 @@ import { Question } from '@/types/interview';
 const sampleQuestion: Question = {
   id: '1',
   text: "Tell me about your experience with React and how you've used it in your projects.",
+  type: 'technical',
   category: 'technical',
   difficulty: 'medium',
-  expectedAnswer: 'Looking for knowledge of React fundamentals, hooks, state management.',
-  type: 'technical'
+  expectedAnswer: 'Looking for knowledge of React fundamentals, hooks, state management.'
 };
 
 const VideoInterviewPage = () => {
