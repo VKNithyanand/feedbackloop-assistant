@@ -5,7 +5,7 @@ import { Question } from '@/types/interview';
 
 const sampleQuestion: Question = {
   id: '1',
-  text: 'Tell me about your experience with React and how you've used it in your projects.',
+  text: "Tell me about your experience with React and how you've used it in your projects.",
   category: 'Technical',
   difficulty: 'Medium',
   expectedAnswer: 'Looking for knowledge of React fundamentals, hooks, state management.',
