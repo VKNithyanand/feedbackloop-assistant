@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,38 @@ export default function Auth() {
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    // Handle email confirmation
+    const handleEmailConfirmation = async () => {
+      const accessToken = searchParams.get('access_token');
+      const refreshToken = searchParams.get('refresh_token');
+      
+      if (accessToken && refreshToken) {
+        const { error } = await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken
+        });
+
+        if (error) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Failed to confirm email. Please try again.",
+          });
+        } else {
+          toast({
+            title: "Success",
+            description: "Email confirmed successfully!",
+          });
+          navigate("/");
+        }
+      }
+    };
+
+    handleEmailConfirmation();
+  }, [searchParams, navigate, toast]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();

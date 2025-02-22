@@ -12,7 +12,8 @@ import {
   CameraOff, 
   Timer,
   RefreshCw,
-  Save
+  Save,
+  AlertTriangle
 } from 'lucide-react';
 import { Question } from '@/types/interview';
 import { CodeEditor } from './CodeEditor';
@@ -37,15 +38,14 @@ export const Interview = ({
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState(timeLimit);
-  const [isPreparingResponse, setIsPreparingResponse] = useState(true);
-  const [transcriptText, setTranscriptText] = useState<string>("");
-  const [answer, setAnswer] = useState("");
-  const [code, setCode] = useState("");
+  const [securityViolations, setSecurityViolations] = useState(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout>();
+  const securityCheckIntervalRef = useRef<NodeJS.Timeout>();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -53,14 +53,25 @@ export const Interview = ({
       initializeMedia();
     }
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+      cleanup();
     };
   }, [mode]);
+
+  const cleanup = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    if (securityCheckIntervalRef.current) {
+      clearInterval(securityCheckIntervalRef.current);
+    }
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+    }
+    setIsRecording(false);
+  };
 
   const initializeMedia = async () => {
     try {
@@ -72,6 +83,7 @@ export const Interview = ({
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
+      setupSecurityCheck(mediaStream);
     } catch (error) {
       toast({
         title: "Error",
@@ -79,6 +91,76 @@ export const Interview = ({
         variant: "destructive",
       });
     }
+  };
+
+  const setupSecurityCheck = (mediaStream: MediaStream) => {
+    const videoTrack = mediaStream.getVideoTracks()[0];
+    const audioTrack = mediaStream.getAudioTracks()[0];
+
+    securityCheckIntervalRef.current = setInterval(async () => {
+      if (!isRecording) return;
+
+      setIsAnalyzing(true);
+      try {
+        const imageCapture = new ImageCapture(videoTrack);
+        const bitmap = await imageCapture.grabFrame();
+        
+        if ('FaceDetector' in window) {
+          const faceDetector = new (window as any).FaceDetector();
+          const faces = await faceDetector.detect(bitmap);
+          
+          if (faces.length > 1) {
+            handleSecurityViolation('Multiple faces detected');
+          }
+        }
+
+        const audioContext = new AudioContext();
+        const analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(mediaStream);
+        source.connect(analyser);
+        
+        analyser.fftSize = 2048;
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyser.getByteTimeDomainData(dataArray);
+        
+        let voiceCount = 0;
+        let lastPeak = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          if (dataArray[i] > 200 && i - lastPeak > 100) {
+            voiceCount++;
+            lastPeak = i;
+          }
+        }
+        
+        if (voiceCount > 1) {
+          handleSecurityViolation('Multiple voices detected');
+        }
+
+      } catch (error) {
+        console.error('Security check error:', error);
+      } finally {
+        setIsAnalyzing(false);
+      }
+    }, 5000);
+  };
+
+  const handleSecurityViolation = (reason: string) => {
+    setSecurityViolations(prev => {
+      const newCount = prev + 1;
+      toast({
+        variant: "destructive",
+        title: "Security Warning",
+        description: `${reason}. Warning ${newCount}/3`,
+      });
+      
+      if (newCount >= 3) {
+        cleanup();
+        onComplete({});
+        return 0;
+      }
+      return newCount;
+    });
   };
 
   const toggleCamera = () => {
@@ -113,14 +195,13 @@ export const Interview = ({
         title: "Quiz Score",
         description: `Your score: ${score}%`,
       });
-      return score >= 70; // Pass threshold
+      return score >= 70;
     }
     
     return true;
   };
 
   const calculateScore = (userAnswer: string, expectedAnswer: string): number => {
-    // Simple scoring based on keyword matching - can be enhanced
     const userKeywords = userAnswer.toLowerCase().split(' ');
     const expectedKeywords = expectedAnswer.toLowerCase().split(' ');
     const matchedKeywords = expectedKeywords.filter(keyword => 
@@ -209,7 +290,15 @@ export const Interview = ({
         >
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-semibold">{question.text}</h3>
-            <span className="text-sm text-muted-foreground capitalize">{mode}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground capitalize">{mode}</span>
+              {isAnalyzing && (
+                <span className="text-yellow-500 animate-pulse flex items-center gap-1">
+                  <AlertTriangle className="w-4 h-4" />
+                  Analyzing
+                </span>
+              )}
+            </div>
           </div>
 
           {renderContent()}
