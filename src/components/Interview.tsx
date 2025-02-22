@@ -1,7 +1,7 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle } from 'lucide-react';
@@ -11,11 +11,11 @@ import { InterviewVideo } from './InterviewVideo';
 import { setupSecurityMonitoring } from '@/utils/securityCheck';
 import { validateAnswer } from '@/utils/scoring';
 
-// Add type definitions
 declare global {
   interface Window {
     ImageCapture: any;
     FaceDetector: any;
+    webkitSpeechRecognition: any;
   }
 }
 
@@ -43,21 +43,92 @@ export const Interview = ({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [answer, setAnswer] = useState("");
   const [code, setCode] = useState("");
+  const [transcription, setTranscription] = useState("");
   
+  const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout>();
   const securityCheckIntervalRef = useRef<NodeJS.Timeout>();
+  const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (mode === 'interview') {
       initializeMedia();
+      initializeSpeechRecognition();
     }
     return () => {
       cleanup();
     };
   }, [mode]);
+
+  useEffect(() => {
+    if (isRecording && timeRemaining > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            handleAutoSubmit();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isRecording, timeRemaining]);
+
+  const initializeSpeechRecognition = () => {
+    if ('webkitSpeechRecognition' in window) {
+      recognitionRef.current = new window.webkitSpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
+      
+      recognitionRef.current.onresult = (event: any) => {
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (finalTranscript) {
+          setTranscription(prev => prev + ' ' + finalTranscript);
+        }
+      };
+      
+      recognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+      };
+    }
+  };
+
+  const startRecording = () => {
+    setIsRecording(true);
+    if (recognitionRef.current) {
+      recognitionRef.current.start();
+    }
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+  };
+
+  const handleAutoSubmit = () => {
+    stopRecording();
+    if (transcription) {
+      onComplete({ text: transcription });
+    }
+    setTimeRemaining(timeLimit);
+    setTranscription("");
+  };
 
   const cleanup = () => {
     if (stream) {
@@ -144,12 +215,16 @@ export const Interview = ({
       }
       onComplete({ code });
     } else if (mode === 'practice' || mode === 'quiz') {
-      if (validateAnswer(answer, question.expectedAnswer, mode === 'quiz')) {
-        onComplete({ text: answer });
+      const textToValidate = mode === 'interview' ? transcription : answer;
+      if (validateAnswer(textToValidate, question.expectedAnswer, mode === 'quiz')) {
+        onComplete({ text: textToValidate });
       }
     }
+    stopRecording();
     setAnswer("");
     setCode("");
+    setTranscription("");
+    setTimeRemaining(timeLimit);
   };
 
   const renderContent = () => {
