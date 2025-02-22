@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,14 @@ import {
 } from 'lucide-react';
 import { Question } from '@/types/interview';
 import { CodeEditor } from './CodeEditor';
+
+// Add ImageCapture type definition
+declare global {
+  interface Window {
+    ImageCapture: any;
+    FaceDetector: any;
+  }
+}
 
 interface InterviewProps {
   question: Question;
@@ -40,6 +49,8 @@ export const Interview = ({
   const [timeRemaining, setTimeRemaining] = useState(timeLimit);
   const [securityViolations, setSecurityViolations] = useState(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [answer, setAnswer] = useState(""); // Add missing state
+  const [code, setCode] = useState(""); // Add missing state
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -102,11 +113,12 @@ export const Interview = ({
 
       setIsAnalyzing(true);
       try {
-        const imageCapture = new ImageCapture(videoTrack);
+        // Check for multiple faces using browser's face detection API
+        const imageCapture = new window.ImageCapture(videoTrack);
         const bitmap = await imageCapture.grabFrame();
         
         if ('FaceDetector' in window) {
-          const faceDetector = new (window as any).FaceDetector();
+          const faceDetector = new window.FaceDetector();
           const faces = await faceDetector.detect(bitmap);
           
           if (faces.length > 1) {
@@ -114,6 +126,7 @@ export const Interview = ({
           }
         }
 
+        // Check for multiple voices
         const audioContext = new AudioContext();
         const analyser = audioContext.createAnalyser();
         const source = audioContext.createMediaStreamSource(mediaStream);
