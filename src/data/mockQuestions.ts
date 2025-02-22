@@ -2,33 +2,17 @@
 import { Question } from "@/types/interview";
 
 export const mockQuestions: Question[] = [
+  // Software Development & Engineering
   {
-    id: "1",
-    text: "Tell me about a challenging project you've worked on and how you overcame obstacles.",
-    type: "behavioral",
-    category: "behavioral",
-    difficulty: "medium",
-    expectedKeywords: ["challenge", "solution", "teamwork", "results", "learning"],
-    followUpQuestions: [
-      "What was the biggest lesson learned?",
-      "How did this experience change your approach to project management?",
-    ],
-    scoringCriteria: {
-      clarity: 0.35,
-      relevance: 0.35,
-      depth: 0.30,
-    },
-  },
-  {
-    id: "2",
-    text: "Describe a situation where you had to debug a complex technical issue. What was your approach?",
+    id: "sde1",
+    text: "What are the phases of the Software Development Life Cycle (SDLC)?",
     type: "technical",
     category: "technical",
-    difficulty: "hard",
-    expectedKeywords: ["debugging", "analysis", "problem-solving", "tools", "solution"],
+    difficulty: "medium",
+    expectedKeywords: ["planning", "analysis", "design", "implementation", "testing", "maintenance"],
     followUpQuestions: [
-      "What tools did you use?",
-      "How would you prevent similar issues in the future?",
+      "Which SDLC phase do you think is most critical?",
+      "How do you handle requirement changes during development?",
     ],
     scoringCriteria: {
       clarity: 0.3,
@@ -37,15 +21,33 @@ export const mockQuestions: Question[] = [
     },
   },
   {
-    id: "3",
-    text: "How do you handle conflicts within a team?",
-    type: "situational",
-    category: "situational",
+    id: "sde2",
+    text: "What is the difference between Agile and Waterfall models?",
+    type: "technical",
+    category: "technical",
     difficulty: "medium",
-    expectedKeywords: ["communication", "resolution", "mediation", "compromise", "understanding"],
+    expectedKeywords: ["iterative", "flexible", "sequential", "documentation", "delivery", "feedback"],
     followUpQuestions: [
-      "Can you provide a specific example?",
-      "What would you do differently next time?",
+      "Which methodology do you prefer and why?",
+      "How do you handle stakeholder communication in each model?",
+    ],
+    scoringCriteria: {
+      clarity: 0.35,
+      relevance: 0.35,
+      depth: 0.3,
+    },
+  },
+  // AI & Machine Learning
+  {
+    id: "ai1",
+    text: "What is the difference between AI and ML?",
+    type: "technical",
+    category: "technical",
+    difficulty: "medium",
+    expectedKeywords: ["artificial intelligence", "machine learning", "subset", "algorithms", "data", "training"],
+    followUpQuestions: [
+      "Can you give practical examples of each?",
+      "How do they complement each other?",
     ],
     scoringCriteria: {
       clarity: 0.4,
@@ -54,20 +56,160 @@ export const mockQuestions: Question[] = [
     },
   },
   {
-    id: "4",
-    text: "Explain a time when you had to make a difficult decision with incomplete information.",
-    type: "leadership",
-    category: "leadership",
+    id: "ai2",
+    text: "What is overfitting in ML?",
+    type: "technical",
+    category: "technical",
     difficulty: "hard",
-    expectedKeywords: ["decision-making", "risk", "analysis", "outcome", "stakeholders"],
+    expectedKeywords: ["training data", "generalization", "noise", "validation", "regularization"],
     followUpQuestions: [
-      "How did you handle the uncertainty?",
-      "What was the outcome of your decision?",
+      "How do you prevent overfitting?",
+      "What's the difference between overfitting and underfitting?",
     ],
     scoringCriteria: {
       clarity: 0.3,
-      relevance: 0.35,
-      depth: 0.35,
+      relevance: 0.4,
+      depth: 0.3,
     },
   },
+  // Cybersecurity
+  {
+    id: "sec1",
+    text: "What are the main types of cyber threats?",
+    type: "technical",
+    category: "technical",
+    difficulty: "medium",
+    expectedKeywords: ["malware", "phishing", "ransomware", "ddos", "social engineering"],
+    followUpQuestions: [
+      "How do you protect against these threats?",
+      "Which threat do you consider most dangerous and why?",
+    ],
+    scoringCriteria: {
+      clarity: 0.3,
+      relevance: 0.4,
+      depth: 0.3,
+    },
+  },
+  {
+    id: "sec2",
+    text: "What is the CIA Triad in cybersecurity?",
+    type: "technical",
+    category: "technical",
+    difficulty: "medium",
+    expectedKeywords: ["confidentiality", "integrity", "availability", "security", "principles"],
+    followUpQuestions: [
+      "How do you ensure each aspect of the CIA triad?",
+      "Which element is most challenging to maintain?",
+    ],
+    scoringCriteria: {
+      clarity: 0.35,
+      relevance: 0.35,
+      depth: 0.3,
+    },
+  },
+  // Cloud Computing & DevOps
+  {
+    id: "cloud1",
+    text: "What is cloud computing?",
+    type: "technical",
+    category: "technical",
+    difficulty: "medium",
+    expectedKeywords: ["services", "internet", "resources", "scalability", "on-demand", "infrastructure"],
+    followUpQuestions: [
+      "What are the main service models in cloud computing?",
+      "What are the advantages and disadvantages of cloud computing?",
+    ],
+    scoringCriteria: {
+      clarity: 0.3,
+      relevance: 0.4,
+      depth: 0.3,
+    },
+  },
+  {
+    id: "devops1",
+    text: "What is CI/CD in DevOps?",
+    type: "technical",
+    category: "technical",
+    difficulty: "hard",
+    expectedKeywords: ["continuous integration", "continuous delivery", "automation", "pipeline", "deployment"],
+    followUpQuestions: [
+      "What tools have you used for CI/CD?",
+      "How do you handle failed deployments?",
+    ],
+    scoringCriteria: {
+      clarity: 0.3,
+      relevance: 0.4,
+      depth: 0.3,
+    },
+  },
+  // Blockchain & Web3
+  {
+    id: "blockchain1",
+    text: "What is blockchain?",
+    type: "technical",
+    category: "technical",
+    difficulty: "medium",
+    expectedKeywords: ["distributed ledger", "decentralized", "cryptography", "consensus", "immutable"],
+    followUpQuestions: [
+      "What are the main applications of blockchain?",
+      "What are the limitations of blockchain technology?",
+    ],
+    scoringCriteria: {
+      clarity: 0.35,
+      relevance: 0.35,
+      depth: 0.3,
+    },
+  },
+  {
+    id: "blockchain2",
+    text: "What are smart contracts?",
+    type: "technical",
+    category: "technical",
+    difficulty: "hard",
+    expectedKeywords: ["self-executing", "automated", "conditions", "blockchain", "ethereum"],
+    followUpQuestions: [
+      "What are the security considerations in smart contracts?",
+      "How do you test smart contracts?",
+    ],
+    scoringCriteria: {
+      clarity: 0.3,
+      relevance: 0.4,
+      depth: 0.3,
+    },
+  },
+  // Computer Networks
+  {
+    id: "network1",
+    text: "What is the OSI model?",
+    type: "technical",
+    category: "technical",
+    difficulty: "medium",
+    expectedKeywords: ["layers", "protocol", "communication", "network", "standardization"],
+    followUpQuestions: [
+      "Can you explain each layer of the OSI model?",
+      "How does data flow through the OSI layers?",
+    ],
+    scoringCriteria: {
+      clarity: 0.35,
+      relevance: 0.35,
+      depth: 0.3,
+    },
+  },
+  {
+    id: "network2",
+    text: "What is the difference between TCP and UDP?",
+    type: "technical",
+    category: "technical",
+    difficulty: "medium",
+    expectedKeywords: ["connection-oriented", "reliability", "speed", "packets", "protocols"],
+    followUpQuestions: [
+      "When would you use TCP over UDP?",
+      "How does TCP ensure reliable delivery?",
+    ],
+    scoringCriteria: {
+      clarity: 0.3,
+      relevance: 0.4,
+      depth: 0.3,
+    },
+  }
 ];
