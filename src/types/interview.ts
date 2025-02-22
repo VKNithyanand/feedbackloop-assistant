@@ -1,4 +1,16 @@
-export type QuestionCategory = "behavioral" | "technical" | "situational" | "leadership" | "problem-solving";
+
+export type QuestionCategory = 
+  | "software_development"
+  | "artificial_intelligence"
+  | "cybersecurity"
+  | "data_science"
+  | "embedded_systems"
+  | "cloud_computing"
+  | "blockchain"
+  | "software_testing"
+  | "computer_networks"
+  | "technical";
+
 export type DifficultyLevel = "easy" | "medium" | "hard" | "expert";
 
 export type Question = {
@@ -7,11 +19,9 @@ export type Question = {
   type: string;
   category: QuestionCategory;
   difficulty: DifficultyLevel;
-  options?: string[];
-  expectedAnswer?: string;
-  expectedKeywords?: string[];
+  expectedKeywords: string[];
   followUpQuestions?: string[];
-  scoringCriteria?: {
+  scoringCriteria: {
     clarity: number;
     relevance: number;
     depth: number;
