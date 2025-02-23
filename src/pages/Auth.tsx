@@ -94,12 +94,17 @@ export default function Auth() {
     setIsLoading(true);
 
     try {
+      // Generate guest credentials
+      const guestEmail = `guest_${Date.now()}@temporary.com`;
+      const guestPassword = `guest${Date.now()}`; // Store password to use for sign in
+      const guestUsername = `Guest${Math.floor(Math.random() * 1000)}`;
+
       const { data, error } = await supabase.auth.signUp({
-        email: `guest_${Date.now()}@temporary.com`,
-        password: `guest${Date.now()}`,
+        email: guestEmail,
+        password: guestPassword,
         options: {
           data: {
-            username: `Guest${Math.floor(Math.random() * 1000)}`,
+            username: guestUsername,
             isGuest: true,
           },
         },
@@ -107,16 +112,17 @@ export default function Auth() {
 
       if (error) throw error;
 
-      // Auto sign in the guest
+      // Auto sign in the guest with the same password used for signup
       if (data.user) {
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: data.user.email!,
-          password: `guest${Date.now()}`,
+          email: guestEmail,
+          password: guestPassword, // Use the same password as signup
         });
         if (signInError) throw signInError;
         navigate("/");
       }
     } catch (error: any) {
+      console.error("Guest login error:", error);
       toast({
         variant: "destructive",
         title: "Error",
