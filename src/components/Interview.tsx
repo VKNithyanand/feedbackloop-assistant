@@ -1,23 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertTriangle } from 'lucide-react';
 import { Question } from '@/types/interview';
 import { CodeEditor } from './CodeEditor';
 import { InterviewVideo } from './InterviewVideo';
-import { setupSecurityMonitoring } from '@/utils/securityCheck';
+import { Timer } from './interview/Timer';
+import { SecurityMonitor } from './interview/SecurityMonitor';
+import { SpeechRecognition } from './interview/SpeechRecognition';
 import { validateAnswer } from '@/utils/scoring';
-
-declare global {
-  interface Window {
-    ImageCapture: any;
-    FaceDetector: any;
-    webkitSpeechRecognition: any;
-  }
-}
 
 interface InterviewProps {
   question: Question;
@@ -44,107 +38,16 @@ export const Interview = ({
   const [answer, setAnswer] = useState("");
   const [code, setCode] = useState("");
   const [transcription, setTranscription] = useState("");
-  
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const timerRef = useRef<NodeJS.Timeout>();
-  const securityCheckIntervalRef = useRef<NodeJS.Timeout>();
-  const recognitionRef = useRef<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (mode === 'interview') {
       initializeMedia();
-      initializeSpeechRecognition();
     }
     return () => {
       cleanup();
     };
   }, [mode]);
-
-  useEffect(() => {
-    if (isRecording && timeRemaining > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1) {
-            handleAutoSubmit();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [isRecording, timeRemaining]);
-
-  const initializeSpeechRecognition = () => {
-    if ('webkitSpeechRecognition' in window) {
-      recognitionRef.current = new window.webkitSpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-      
-      recognitionRef.current.onresult = (event: any) => {
-        let finalTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript;
-          }
-        }
-        if (finalTranscript) {
-          setTranscription(prev => prev + ' ' + finalTranscript);
-        }
-      };
-      
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error);
-      };
-    }
-  };
-
-  const startRecording = () => {
-    setIsRecording(true);
-    if (recognitionRef.current) {
-      recognitionRef.current.start();
-    }
-  };
-
-  const stopRecording = () => {
-    setIsRecording(false);
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
-  };
-
-  const handleAutoSubmit = () => {
-    stopRecording();
-    if (transcription) {
-      onComplete({ text: transcription });
-    }
-    setTimeRemaining(timeLimit);
-    setTranscription("");
-  };
-
-  const cleanup = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    if (securityCheckIntervalRef.current) {
-      clearInterval(securityCheckIntervalRef.current);
-    }
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-    }
-    setIsRecording(false);
-  };
 
   const initializeMedia = async () => {
     try {
@@ -153,13 +56,6 @@ export const Interview = ({
         audio: true
       });
       setStream(mediaStream);
-
-      securityCheckIntervalRef.current = setupSecurityMonitoring(
-        mediaStream,
-        isRecording,
-        setIsAnalyzing,
-        handleSecurityViolation
-      );
     } catch (error) {
       toast({
         title: "Error",
@@ -169,22 +65,29 @@ export const Interview = ({
     }
   };
 
-  const handleSecurityViolation = (reason: string) => {
-    setSecurityViolations(prev => {
-      const newCount = prev + 1;
-      toast({
-        variant: "destructive",
-        title: "Security Warning",
-        description: `${reason}. Warning ${newCount}/3`,
-      });
-      
-      if (newCount >= 3) {
-        cleanup();
-        onComplete({});
-        return 0;
-      }
-      return newCount;
-    });
+  const cleanup = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+    setIsRecording(false);
+  };
+
+  const handleAutoSubmit = () => {
+    setIsRecording(false);
+    if (transcription) {
+      onComplete({ text: transcription });
+    }
+    setTimeRemaining(timeLimit);
+    setTranscription("");
+  };
+
+  const handleSecurityViolation = (newCount: number) => {
+    if (newCount >= 3) {
+      cleanup();
+      onComplete({});
+      return 0;
+    }
+    return newCount;
   };
 
   const toggleCamera = () => {
@@ -225,7 +128,7 @@ export const Interview = ({
       }
     }
     
-    stopRecording();
+    setIsRecording(false);
     setAnswer("");
     setCode("");
     setTranscription("");
@@ -271,6 +174,25 @@ export const Interview = ({
 
   return (
     <Card className="glass-card p-6 space-y-6 backdrop-blur-xl bg-background/80">
+      <Timer 
+        isActive={isRecording}
+        timeRemaining={timeRemaining}
+        setTimeRemaining={setTimeRemaining}
+        onTimeUp={handleAutoSubmit}
+      />
+      
+      <SecurityMonitor
+        stream={stream}
+        isRecording={isRecording}
+        setIsAnalyzing={setIsAnalyzing}
+        onViolation={setSecurityViolations}
+      />
+      
+      <SpeechRecognition
+        isRecording={isRecording}
+        onTranscriptionUpdate={setTranscription}
+      />
+
       <AnimatePresence mode="wait">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
