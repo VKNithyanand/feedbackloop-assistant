@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -216,19 +215,16 @@ export const Interview = ({
       }
       onComplete({ code });
     } else if (mode === 'practice' || mode === 'quiz') {
-      // Fixed: Use transcription for interview mode, answer for practice/quiz
       const textToValidate = answer;
-      if (validateAnswer(textToValidate, question.expectedAnswer, mode === 'quiz')) {
+      if (validateAnswer(textToValidate, question.expectedKeywords.join(' '), mode === 'quiz')) {
         onComplete({ text: textToValidate });
       }
     } else if (mode === 'interview') {
-      // Handle interview mode separately
       if (transcription) {
         onComplete({ text: transcription });
       }
     }
     
-    // Reset states after submission
     stopRecording();
     setAnswer("");
     setCode("");

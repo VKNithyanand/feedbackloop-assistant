@@ -9,7 +9,12 @@ const sampleQuestion: Question = {
   type: 'technical',
   category: 'technical',
   difficulty: 'medium',
-  expectedAnswer: 'Looking for knowledge of React fundamentals, hooks, state management.'
+  expectedKeywords: ['React', 'hooks', 'state management', 'components'],
+  scoringCriteria: {
+    clarity: 0.3,
+    relevance: 0.4,
+    depth: 0.3
+  }
 };
 
 const VideoInterviewPage = () => {
