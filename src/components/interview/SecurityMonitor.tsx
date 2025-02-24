@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { setupSecurityMonitoring } from '@/utils/securityCheck';
 
@@ -18,6 +18,7 @@ export const SecurityMonitor = ({
 }: SecurityMonitorProps) => {
   const { toast } = useToast();
   const securityCheckIntervalRef = useRef<NodeJS.Timeout>();
+  const [violationCount, setViolationCount] = useState(0);
 
   useEffect(() => {
     if (stream) {
@@ -26,7 +27,8 @@ export const SecurityMonitor = ({
         isRecording,
         setIsAnalyzing,
         (reason: string) => {
-          const newCount = securityViolationCount + 1;
+          const newCount = violationCount + 1;
+          setViolationCount(newCount);
           onViolation(newCount);
           toast({
             variant: "destructive",
@@ -42,7 +44,7 @@ export const SecurityMonitor = ({
         clearInterval(securityCheckIntervalRef.current);
       }
     };
-  }, [stream, isRecording, setIsAnalyzing, onViolation, toast]);
+  }, [stream, isRecording, setIsAnalyzing, onViolation, toast, violationCount]);
 
   return null;
 };

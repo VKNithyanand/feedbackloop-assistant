@@ -1,6 +1,26 @@
 
 import { toast } from "@/components/ui/use-toast";
 
+// Add TypeScript declarations for the ImageCapture and FaceDetector APIs
+declare global {
+  interface Window {
+    ImageCapture: {
+      new(track: MediaStreamTrack): ImageCapture;
+    };
+    FaceDetector: {
+      new(options?: { maxDetectedFaces?: number }): FaceDetector;
+    };
+  }
+  
+  interface ImageCapture {
+    grabFrame(): Promise<ImageBitmap>;
+  }
+  
+  interface FaceDetector {
+    detect(image: ImageBitmap): Promise<Array<{ boundingBox: DOMRect }>>;
+  }
+}
+
 export const setupSecurityMonitoring = (
   mediaStream: MediaStream,
   isRecording: boolean,
@@ -35,6 +55,11 @@ const checkFaces = async (
   videoTrack: MediaStreamTrack,
   onViolation: (reason: string) => void
 ) => {
+  if (!('ImageCapture' in window)) {
+    console.warn('ImageCapture API not supported');
+    return;
+  }
+
   const imageCapture = new window.ImageCapture(videoTrack);
   const bitmap = await imageCapture.grabFrame();
   
@@ -69,13 +94,11 @@ const checkVoices = async (
   let backgroundNoise = false;
   
   for (let i = 0; i < bufferLength; i++) {
-    // Check for distinct voice patterns
     if (dataArray[i] > 200 && i - lastPeak > 100) {
       voiceCount++;
       lastPeak = i;
     }
     
-    // Check for sustained background noise
     if (dataArray[i] > 150 && dataArray[i] < 180) {
       backgroundNoise = true;
     }
@@ -90,11 +113,15 @@ const checkVoices = async (
   }
 };
 
-// Basic gaze detection using face landmarks
 const checkGaze = async (
   videoTrack: MediaStreamTrack,
   onViolation: (reason: string) => void
 ) => {
+  if (!('ImageCapture' in window)) {
+    console.warn('ImageCapture API not supported');
+    return;
+  }
+
   const imageCapture = new window.ImageCapture(videoTrack);
   const bitmap = await imageCapture.grabFrame();
   
@@ -106,7 +133,6 @@ const checkGaze = async (
       const face = faces[0];
       const { boundingBox } = face;
       
-      // Basic gaze direction check based on face position in frame
       if (boundingBox.x < 0.2 || boundingBox.x > 0.8) {
         onViolation('Candidate appears to be looking away from screen');
       }
@@ -114,16 +140,18 @@ const checkGaze = async (
   }
 };
 
-// Basic environment check for movement and objects
 const checkEnvironment = async (
   videoTrack: MediaStreamTrack,
   onViolation: (reason: string) => void
 ) => {
+  if (!('ImageCapture' in window)) {
+    console.warn('ImageCapture API not supported');
+    return;
+  }
+
   const imageCapture = new window.ImageCapture(videoTrack);
   const bitmap = await imageCapture.grabFrame();
   
-  // Analyze frame for sudden movements or changes
-  // This is a basic implementation that could be enhanced with more sophisticated computer vision
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const ctx = canvas.getContext('2d');
   if (ctx) {
