@@ -26,14 +26,12 @@ export const SecurityMonitor = ({
         isRecording,
         setIsAnalyzing,
         (reason: string) => {
-          onViolation((prev: number) => {
-            const newCount = prev + 1;
-            toast({
-              variant: "destructive",
-              title: "Security Warning",
-              description: `${reason}. Warning ${newCount}/3`,
-            });
-            return newCount;
+          const newCount = securityViolationCount + 1;
+          onViolation(newCount);
+          toast({
+            variant: "destructive",
+            title: "Security Warning",
+            description: `${reason}. Warning ${newCount}/3`,
           });
         }
       );

@@ -6,6 +6,12 @@ interface SpeechRecognitionProps {
   onTranscriptionUpdate: (text: string) => void;
 }
 
+declare global {
+  interface Window {
+    webkitSpeechRecognition: new () => any;
+  }
+}
+
 export const SpeechRecognition = ({ isRecording, onTranscriptionUpdate }: SpeechRecognitionProps) => {
   const recognitionRef = useRef<any>(null);
 
@@ -23,7 +29,7 @@ export const SpeechRecognition = ({ isRecording, onTranscriptionUpdate }: Speech
           }
         }
         if (finalTranscript) {
-          onTranscriptionUpdate(prev => prev + ' ' + finalTranscript);
+          onTranscriptionUpdate(finalTranscript);
         }
       };
       

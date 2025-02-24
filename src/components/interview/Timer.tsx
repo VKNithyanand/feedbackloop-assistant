@@ -14,13 +14,13 @@ export const Timer = ({ isActive, timeRemaining, setTimeRemaining, onTimeUp }: T
   useEffect(() => {
     if (isActive && timeRemaining > 0) {
       timerRef.current = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 1) {
-            onTimeUp();
-            return 0;
-          }
-          return prev - 1;
-        });
+        const newTime = timeRemaining - 1;
+        if (newTime <= 0) {
+          onTimeUp();
+          setTimeRemaining(0);
+        } else {
+          setTimeRemaining(newTime);
+        }
       }, 1000);
     }
     
